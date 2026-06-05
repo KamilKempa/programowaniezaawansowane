@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, Date
 from database import Base
 
 class CurrencyRate(Base):
@@ -8,3 +8,4 @@ class CurrencyRate(Base):
     code = Column(String)
     currency = Column(String)
     mid = Column(Float)
+    date = Column(Date)

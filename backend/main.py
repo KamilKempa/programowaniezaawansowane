@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 import requests
 import models
 from database import engine, Base, SessionLocal
-
+from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
@@ -20,13 +21,22 @@ def root():
     return{"route works"}
 
 @app.post("/currencies/fetch")
-def fetch_currencies(db: Session = Depends(get_db)):
-    url = "https://api.nbp.pl/api/exchangerates/tables/A?format=json"
+def fetch_currencies(date: str = None,db: Session = Depends(get_db)):
+
+    if date:
+        url = f"https://api.nbp.pl/api/exchangerates/tables/A/{date}/?format=json"
+    else:
+        url = "https://api.nbp.pl/api/exchangerates/tables/A?format=json"
 
     response = requests.get(url)
-    data = response.json()
+    data = response.json()[0]
 
-    rates = data[0]["rates"]
+    rates = data["rates"]
+    parsed_date = datetime.strptime(data["effectiveDate"], "%Y-%m-%d").date()
+
+    db.query(models.CurrencyRate).filter(
+        models.CurrencyRate.date == parsed_date
+    ).delete()
 
     saved = []
 
@@ -34,13 +44,15 @@ def fetch_currencies(db: Session = Depends(get_db)):
         db_rate = models.CurrencyRate(
             code=r["code"],
             currency=r["currency"],
-            mid=r["mid"]
+            mid=r["mid"],
+            date=parsed_date
         )
         db.add(db_rate)
         saved.append({
             "code": r["code"],
             "currency": r["currency"],
-            "mid": r["mid"]
+            "mid": r["mid"],
+            "date": parsed_date
         })
 
     db.commit()
@@ -54,9 +66,12 @@ def fetch_currencies(db: Session = Depends(get_db)):
 #get kursow walut z bazy danych
 
 @app.get("/currencies")
-def get_currencies(code: str = None,db: Session = Depends(get_db)):
+def get_currencies(date: str = None, code: str = None,db: Session = Depends(get_db)):
     query = db.query(models.CurrencyRate)
 
+    if date:
+        date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+        query = query.filter(models.CurrencyRate.date == date_obj)
     if code:
         query = query.filter(models.CurrencyRate.code == code)
 
@@ -66,7 +81,8 @@ def get_currencies(code: str = None,db: Session = Depends(get_db)):
         {
             "code": d.code,
             "currency": d.currency,
-            "mid": d.mid
+            "mid": d.mid,
+            "date": d.date
         }
         for d in data
     ]
@@ -83,3 +99,11 @@ def currencies(code: str):
 def get_rates(date: str):
     return {"date": date}
 
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
