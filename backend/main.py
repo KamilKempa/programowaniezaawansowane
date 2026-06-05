@@ -1,10 +1,22 @@
 from fastapi import FastAPI
+import requests
 
 app = FastAPI()
 
 @app.get("/")
 def root():
     return{"route works"}
+
+@app.post("/currencies/fetch")
+def fetch_currencies():
+    url = "https://api.nbp.pl/api/exchangerates/tables/A?format=json"
+
+    response = requests.get(url)
+    data = response.json()
+
+    return data
+
+# NIE WYKORZYSTANE
 
 @app.get("/testowa")
 def testowa():
@@ -20,9 +32,3 @@ def currencies(code: str):
 def get_rates(date: str):
     return {"date": date}
 
-@app.post("/currencies/fetch")
-def fetch_currencies():
-    return {
-        "status": "success",
-        "message": "pobieranie kursow walut"
-    }
