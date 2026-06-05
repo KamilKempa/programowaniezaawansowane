@@ -24,7 +24,10 @@ def fetch_currencies():
             "currency": r["currency"],
             "mid": r["mid"]
         })
-    return cleaned
+    return {
+        "count": len(cleaned),
+        "rates":cleaned
+    }
 
 # NIE WYKORZYSTANE
 
