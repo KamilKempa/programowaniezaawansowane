@@ -54,8 +54,14 @@ def fetch_currencies(db: Session = Depends(get_db)):
 #get kursow walut z bazy danych
 
 @app.get("/currencies")
-def get_currencies(db: Session = Depends(get_db)):
-    data = db.query(models.CurrencyRate).all()
+def get_currencies(code: str = None,db: Session = Depends(get_db)):
+    query = db.query(models.CurrencyRate)
+
+    if code:
+        query = query.filter(models.CurrencyRate.code == code)
+
+    data = query.all()
+
     return[
         {
             "code": d.code,
