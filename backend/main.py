@@ -51,11 +51,21 @@ def fetch_currencies(db: Session = Depends(get_db)):
         "rates":saved
     }
 
-# NIE WYKORZYSTANE
+#get kursow walut z bazy danych
 
-@app.get("/testowa")
-def testowa():
-    return{"testowa"}
+@app.get("/currencies")
+def get_currencies(db: Session = Depends(get_db)):
+    data = db.query(models.CurrencyRate).all()
+    return[
+        {
+            "code": d.code,
+            "currency": d.currency,
+            "mid": d.mid
+        }
+        for d in data
+    ]
+
+# NIE WYKORZYSTANE
 
 # parametr path http://localhost:8000/currency/PLN
 @app.get("/currency/{code}")
