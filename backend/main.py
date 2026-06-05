@@ -14,7 +14,17 @@ def fetch_currencies():
     response = requests.get(url)
     data = response.json()
 
-    return data
+    rates = data[0]["rates"]
+
+    cleaned = []
+
+    for r in rates:
+        cleaned.append({
+            "code": r["code"],
+            "currency": r["currency"],
+            "mid": r["mid"]
+        })
+    return cleaned
 
 # NIE WYKORZYSTANE
 
