@@ -1,14 +1,26 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
 import requests
+import models
+from database import engine, Base, SessionLocal
 
 app = FastAPI()
+Base.metadata.create_all(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 @app.get("/")
 def root():
     return{"route works"}
 
 @app.post("/currencies/fetch")
-def fetch_currencies():
+def fetch_currencies(db: Session = Depends(get_db)):
     url = "https://api.nbp.pl/api/exchangerates/tables/A?format=json"
 
     response = requests.get(url)
@@ -16,17 +28,27 @@ def fetch_currencies():
 
     rates = data[0]["rates"]
 
-    cleaned = []
+    saved = []
 
     for r in rates:
-        cleaned.append({
+        db_rate = models.CurrencyRate(
+            code=r["code"],
+            currency=r["currency"],
+            mid=r["mid"]
+        )
+        db.add(db_rate)
+        saved.append({
             "code": r["code"],
             "currency": r["currency"],
             "mid": r["mid"]
         })
+
+    db.commit()
+
     return {
-        "count": len(cleaned),
-        "rates":cleaned
+        "message": "dane zostaly zapisane",
+        "count": len(saved),
+        "rates":saved
     }
 
 # NIE WYKORZYSTANE
