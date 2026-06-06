@@ -8,6 +8,9 @@ import { Currency } from './models/currency';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  year: number = new Date().getFullYear();
+  month: number = new Date().getMonth() + 1;
+  quarter: number = 1;
   currencies: Currency[] = [];
 
   constructor(private service: CurrencyService) {}
@@ -24,10 +27,42 @@ export class AppComponent implements OnInit {
   }
   date: string = '';
 
-fetch() {
-  this.service.fetchCurrencies(this.date).subscribe(() => {
-    alert('Pobrano dane');
-    this.load(this.date);
-  });
-}
+  handleError(err: any) {
+    const msg =
+      err.error?.detail ||
+      err.error?.error ||
+      'Brak danych dla wybranego okresu';
+  
+    alert(msg);
+  }
+
+  fetch() {
+    this.service.fetchCurrencies(this.date).subscribe({
+      next: () => {
+        alert('Pobrano dane');
+        this.load(this.date);
+      },
+      error: (err) => this.handleError(err)
+    });
+  }
+  loadYear() {
+    this.service.getByYear(this.year).subscribe({
+      next: data => this.currencies = data,
+      error: err => this.handleError(err)
+    });
+  }
+  
+  loadMonth() {
+    this.service.getByMonth(this.year, this.month).subscribe({
+      next: data => this.currencies = data,
+      error: err => this.handleError(err)
+    });
+  }
+  
+  loadQuarter() {
+    this.service.getByQuarter(this.year, this.quarter).subscribe({
+      next: data => this.currencies = data,
+      error: err => this.handleError(err)
+    });
+  }
 }

@@ -1,21 +1,56 @@
-<h1>Kursy walut</h1>
-<input type="date" [(ngModel)]="date">
+<div class="container">
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-6">
+      <h2>Kursy walut</h2>
+      <p>Pamietaj ze gielda w soboty i niedziele bywa zamknięta</p>
+      <h3>Konkretna data</h3>
+      <input type="date" class="form-control mb-2" [(ngModel)]="date">
+      <button class="btn btn-primary mb-2" (click)="fetch()">Pobierz z NBP</button>
+      <h3>Miesiąc</h3>
+      <input class="form-control mb-2" type="number" [(ngModel)]="year">
+      <input class="form-control mb-2" type="number" [(ngModel)]="month" min="1" max="12">
+      <button class="btn btn-primary mb-2" (click)="loadMonth()">Pokaż miesiąc</button>
+      <h3>Kwartał</h3>
+      <input class="form-control mb-2" type="number" [(ngModel)]="year">
+      <select class="form-select mb-2" [(ngModel)]="quarter">
+        <option [value]="1">KWARTAŁ 1</option>
+        <option [value]="2">KWARTAŁ 2</option>
+        <option [value]="3">KWARTAŁ 3</option>
+        <option [value]="4">KWARTAŁ 4</option>
+      </select>
+      <button class="btn btn-primary mb-2" (click)="loadQuarter()">Pokaż kwartał</button>
+      <h3>Rok</h3>
+      <input class="form-control mb-2" type="number" [(ngModel)]="year">
+      <button class="btn btn-primary mb-2" (click)="loadYear()">Pokaż rok</button>
+    </div>
+    <div class="col-6">
+      <h2>Zakres tabeli: </h2>
+      <table class="table table-striped table-hover">
 
-<button (click)="fetch()">Pobierz z NBP</button>
-<button (click)="load(date)">Pokaż dane</button>
-<br>
-<table border="1">
-  <tr>
-    <th>Kod</th>
-    <th>Waluta</th>
-    <th>Kurs</th>
-    <th>Data</th>
-  </tr>
+        <thead class="table-dark">
+          <tr>
+            <th>Kod</th>
+            <th>Waluta</th>
+            <th>Kurs</th>
+            <th>Data</th>
+          </tr>
+        </thead>
 
-  <tr *ngFor="let c of currencies">
-    <td>{{ c.code }}</td>
-    <td>{{ c.currency }}</td>
-    <td>{{ c.mid }}</td>
-    <td>{{ c.date }}</td>
-  </tr>
-</table>
+        <tbody>
+          <tr *ngFor="let c of currencies">
+            <td>{{ c.code }}</td>
+            <td>{{ c.currency }}</td>
+            <td>{{ c.mid }}</td>
+            <td>{{ c.date }}</td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+
+</div>
+
+

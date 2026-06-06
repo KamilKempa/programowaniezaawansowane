@@ -21,6 +21,24 @@ export class CurrencyService {
     return this.http.get<Currency[]>(url);
   }
 
+  getByYear(year: number) {
+    return this.http.get<Currency[]>(
+      `${this.api}/currencies/year/${year}`
+    );
+  }
+  
+  getByMonth(year: number, month: number) {
+    return this.http.get<Currency[]>(
+      `${this.api}/currencies/month/${year}/${month}`
+    );
+  }
+  
+  getByQuarter(year: number, quarter: number) {
+    return this.http.get<Currency[]>(
+      `${this.api}/currencies/quarter/${year}/${quarter}`
+    );
+  }
+  
   fetchCurrencies(date: string) {
     return this.http.post(`${this.api}/currencies/fetch?date=${date}`, {});
   }
