@@ -4,7 +4,8 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL",
+    "postgresql://currency_admin:trudnehaslo123@localhost:5433/currencies")
 
 if not DATABASE_URL:
     raise Exception("DATABASE URL jest pusty w env")
