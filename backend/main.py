@@ -31,7 +31,7 @@ def is_weekend(date_str: str):
 
 @app.get("/")
 def root():
-    return{"route works"}
+    return{"fastapi dziala": True}
 
 @app.post("/currencies/fetch")
 def fetch_currencies(date: str = None,db: Session = Depends(get_db)):
